@@ -6,9 +6,6 @@ https://github.com/sydhds/Avpy/blob/master/avpy/version/av9.py
 https://stackoverflow.com/questions/43810423/what-is-the-most-efficient-way-to-copy-an-externally-provided-buffer-to-bytes
 '''
 from ctypes import *
-#import cProfile, pstats, io
-#pr = cProfile.Profile()
-#pr_flag=False
 '''
 avcodec-58
 '''
@@ -1073,14 +1070,7 @@ class SwsContext(ctypes.Structure):    #swscale_internal.h
 
 '''
 '''
-
-
 import os
-#import sys
-#import ctypes.cdll
-#import PIL
-#from PIL import Image
-#import numpy as np
 
 os.environ['PATH']='C:\\sw\\ffmpeg-20180702-3c4af57-win64-shared\\bin' #location of avcodec-58.dll
 avcodec=WinDLL('avcodec-58.dll')
@@ -1172,28 +1162,6 @@ AV_NOPTS_VALUE=c_int64(0x8000000000000000)    #((int64_t)UINT64_C(0x800000000000
 '''
 run main
 '''
-#print(__name__)
 
 if __name__=='__main__':
     None
-    #f=bytes("F:\\myfile\\soulworker\\Soulworker 2018.07.10 - 19.39.26.10.mp4",'utf-8')
-    #f=bytes("F:\\myfile\\idlogo.mp4",'utf-8')
-    #h264_test(f)
-    
-    #f=bytes("F:\\myfile\\soulworker\\Soulworker 2018.07.04 - 22.02.05.31.mp4",'utf-8')
-    #h264_test(f)
-    #print(sys.argv[1])
-    #print(os.path.dirname(f))
-    #print(os.path.abspath(f))
-    #print(os.path.basename(f))
-    #print(os.path.split(f))
-    #print(str(os.path.splitext(f)[0],'utf-8')+'.'+str(1212)+'.jpg')
-    
-    #decode_video()
-
-#if pr_flag:
-#    s = io.StringIO()
-#    sortby = 'cumulative'
-#    ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-#    ps.print_stats()
-#    print(s.getvalue()) 
