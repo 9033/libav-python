@@ -1147,9 +1147,9 @@ swscale.sws_getContext.restype=POINTER(SwsContext)
 #int sws_scale(struct SwsContext *c, const uint8_t *const srcSlice[],
 #const int srcStride[], int srcSliceY, int srcSliceH,
 #uint8_t *const dst[], const int dstStride[]);
-swscale.sws_scale.argtypes=[POINTER(SwsContext),POINTER(c_uint8)*4,
-c_int*4,c_int,c_int,
-POINTER(c_uint8)*8,c_int*8]
+#swscale.sws_scale.argtypes=[POINTER(SwsContext),POINTER(c_uint8)*4,
+#c_int*4,c_int,c_int,
+#POINTER(c_uint8)*8,c_int*8]
 swscale.sws_scale.restype=c_int
 
 AV_PIX_FMT_RGB24=2
