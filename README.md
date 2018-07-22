@@ -6,4 +6,4 @@ use shared dll files of ffmpeg by python
 - ffmpeg 20180702 win64, shared library
 
 # etc
-- I'm using for [this](http://www.evernote.com/l/AVSO8Fl31ddHlKtXNS4sSVbpt1GOHHLYA1Q/). Recorded mp4 for conversation with npc. Converting mp4 to jpeg, when if caption changed.
+- I'm using for [this](http://www.evernote.com/l/AVSO8Fl31ddHlKtXNS4sSVbpt1GOHHLYA1Q/). Recorded mp4 for conversations with npc. Converting mp4 to jpeg, when if caption changed.
