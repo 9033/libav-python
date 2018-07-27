@@ -1068,6 +1068,13 @@ class SwsFilter(ctypes.Structure):
 class SwsContext(ctypes.Structure):    #swscale_internal.h
     pass
 
+class AVCodecHWConfig(ctypes.Structure):
+    _fields_ = [('pix_fmt', c_int) #enum AVPixelFormat
+               ,('methods', c_int)
+               ,('device_type', c_int) #enum AVHWDeviceType
+               ]
+AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX = 0x01     
+
 '''
 '''
 import os
@@ -1079,6 +1086,36 @@ avformat=WinDLL('avformat-58.dll')
 swscale=WinDLL('swscale-5.dll')
 #https://gist.github.com/Neon22/eb5af7bcdcdfa2ab7d22c3d27e018bbd
 
+def AV_VERSION_INT(a, b, c):return ((a)<<16 | (b)<<8 | (c))
+def AV_VERSION_MAJOR(a):return ((a) >> 16)
+def AV_VERSION_MINOR(a):return (((a) & 0x00FF00) >> 8)
+def AV_VERSION_MICRO(a):return ((a) & 0xFF)
+def AV_VERSION(a, b, c):return str(a)+'.'+str(b)+'.'+str(c)
+
+def libff_version():
+    print('version check')
+    
+    avcodec.avcodec_version.restype=c_uint
+    ret=avcodec.avcodec_version()
+    M,m,mm=58,20,104
+    print('avcodec',AV_VERSION(M,m,mm),ret==AV_VERSION_INT(M,m,mm))
+    
+    avformat.avformat_version.restype=c_uint
+    ret=avformat.avformat_version()
+    M,m,mm=58,17,101
+    print('avformat',AV_VERSION(M,m,mm),ret==AV_VERSION_INT(M,m,mm))
+    
+    avutil.avutil_version.restype=c_uint
+    ret=avutil.avutil_version()
+    M,m,mm=56,18,102
+    print('avutil',AV_VERSION(M,m,mm),ret==AV_VERSION_INT(M,m,mm))
+    
+    swscale.swscale_version.restype=c_uint
+    ret=swscale.swscale_version()
+    M,m,mm=5,2,100
+    print('swscale',AV_VERSION(M,m,mm),ret==AV_VERSION_INT(M,m,mm))
+
+libff_version()
 
 avformat.avformat_open_input.argtypes=[POINTER(POINTER(AVFormatContext)),c_char_p,POINTER(AVInputFormat),POINTER(POINTER(AVDictionary))]
 avformat.avformat_open_input.restype=c_int
@@ -1094,68 +1131,70 @@ avcodec.av_init_packet.argtypes=[POINTER(AVPacket)]
 avcodec.av_init_packet.restype=None
 avcodec.av_packet_unref.argtypes=[POINTER(AVPacket)]
 avcodec.av_packet_unref.restype=None
-#AVCodec *avcodec_find_encoder(enum AVCodecID id);
-avcodec.avcodec_find_decoder.argtypes=[c_int]
-avcodec.avcodec_find_decoder.restype=POINTER(AVCodec)
-#AVCodec *avcodec_find_encoder(enum AVCodecID id);
-avcodec.avcodec_find_encoder.argtypes=[c_int]
-avcodec.avcodec_find_encoder.restype=POINTER(AVCodec)
-#AVCodecContext *avcodec_alloc_context3(const AVCodec *codec);
 avcodec.avcodec_alloc_context3.argtypes=[POINTER(AVCodec)]
 avcodec.avcodec_alloc_context3.restype=POINTER(AVCodecContext)
-avcodec.avcodec_parameters_to_context.argtypes=[POINTER(AVCodecContext),POINTER(AVCodecParameters)]
-avcodec.avcodec_parameters_to_context.restype=c_int
-avcodec.avcodec_open2.argtypes=[POINTER(AVCodecContext),POINTER(AVCodec),POINTER(POINTER(AVDictionary))]
-avcodec.avcodec_open2.restype=c_int
 avcodec.avcodec_decode_video2.argtypes=[POINTER(AVCodecContext),POINTER(AVFrame),POINTER(c_int),POINTER(AVPacket)]
 avcodec.avcodec_decode_video2.restype=c_int
-#int avpicture_get_size(enum AVPixelFormat pix_fmt, int width, int height);
-avcodec.avcodec_free_context.argtypes=[POINTER(POINTER(AVCodecContext))]
-#int avcodec_encode_video2(AVCodecContext *avctx, AVPacket *avpkt,
-#          const AVFrame *frame, int *got_packet_ptr);
 avcodec.avcodec_encode_video2.argtypes=[POINTER(AVCodecContext),POINTER(AVPacket),POINTER(AVFrame),POINTER(c_int)]
 avcodec.avcodec_encode_video2.restype=c_int
-#void avcodec_free_context(AVCodecContext **avctx);
+avcodec.avcodec_find_decoder.argtypes=[c_int]
+avcodec.avcodec_find_decoder.restype=POINTER(AVCodec)
+avcodec.avcodec_find_encoder.argtypes=[c_int]
+avcodec.avcodec_find_encoder.restype=POINTER(AVCodec)
 avcodec.avcodec_free_context.argtypes=[POINTER(POINTER(AVCodecContext))]
 avcodec.avcodec_free_context.restype=None    
+avcodec.avcodec_get_hw_config.argtypes=[POINTER(AVCodec), c_int]
+avcodec.avcodec_get_hw_config.restype=POINTER(AVCodecHWConfig)    
+avcodec.avcodec_open2.argtypes=[POINTER(AVCodecContext),POINTER(AVCodec),POINTER(POINTER(AVDictionary))]
+avcodec.avcodec_open2.restype=c_int
+avcodec.avcodec_parameters_to_context.argtypes=[POINTER(AVCodecContext),POINTER(AVCodecParameters)]
+avcodec.avcodec_parameters_to_context.restype=c_int
 avcodec.avpicture_get_size.argtypes=[c_int,c_int,c_int]
 avcodec.avpicture_get_size.restype=c_int
 
+avutil.av_adler32_update.argtypes=[c_ulong,POINTER(c_uint8),c_int]
+avutil.av_adler32_update.restype=c_ulong
+avutil.av_buffer_ref.argtypes=[POINTER(AVBufferRef)]
+avutil.av_buffer_ref.restype=POINTER(AVBufferRef)
 avutil.av_frame_alloc.restype=POINTER(AVFrame)
 avutil.av_frame_free.argtypes=[POINTER(POINTER(AVFrame))]
 avutil.av_freep.argtypes=[c_void_p]
 avutil.av_malloc.argtypes=[c_int]
 avutil.av_malloc.restype=c_void_p#POINTER(c_ubyte)
-avutil.av_adler32_update.argtypes=[c_ulong,POINTER(c_uint8),c_int]
-avutil.av_adler32_update.restype=c_ulong
 avutil.av_image_get_buffer_size.argtypes=[c_int,c_int,c_int,c_int]
 avutil.av_image_get_buffer_size.restype=c_int
 avutil.av_image_copy_to_buffer.argtypes=[POINTER(c_uint8),c_int,                
 POINTER(c_uint8)*4,c_int*4,
 c_int,c_int,c_int,c_int]
 avutil.av_image_copy_to_buffer.restype=c_int
+avutil.av_image_get_buffer_size.argtypes=[c_int, c_int, c_int, c_int]
+avutil.av_image_get_buffer_size.restype=c_int
+avutil.av_hwdevice_get_type_name.argtypes=[c_int]
+avutil.av_hwdevice_get_type_name.restype=c_char_p            
+avutil.av_hwdevice_ctx_create.argtypes=[POINTER(POINTER(AVBufferRef)), c_int, c_char_p, POINTER(AVDictionary), c_int]
+avutil.av_hwdevice_ctx_create.restype=c_int
+avutil.av_hwdevice_iterate_types.argtypes=[c_int]
+avutil.av_hwdevice_iterate_types.restype=c_int
+avutil.av_hwframe_transfer_data.argtypes=[POINTER(AVFrame), POINTER(AVFrame), c_int]
+avutil.av_hwframe_transfer_data.restype=c_int
 
-#struct SwsContext *sws_getContext(int srcW, int srcH, enum AVPixelFormat srcFormat,
-                #int dstW, int dstH, enum AVPixelFormat dstFormat,
-                #int flags, SwsFilter *srcFilter,
-                #SwsFilter *dstFilter, const double *param);
 swscale.sws_getContext.argtypes=[c_int,c_int,c_int,
 c_int,c_int,c_int,
 c_int,POINTER(SwsFilter),
 POINTER(SwsFilter),POINTER(c_double)]
 swscale.sws_getContext.restype=POINTER(SwsContext)
-#int sws_scale(struct SwsContext *c, const uint8_t *const srcSlice[],
-#const int srcStride[], int srcSliceY, int srcSliceH,
-#uint8_t *const dst[], const int dstStride[]);
-#swscale.sws_scale.argtypes=[POINTER(SwsContext),POINTER(c_uint8)*4,
-#c_int*4,c_int,c_int,
-#POINTER(c_uint8)*8,c_int*8]
 swscale.sws_scale.restype=c_int
+swscale.sws_freeContext.argtypes=[POINTER(SwsContext)]
+swscale.sws_getCachedContext.restype=POINTER(SwsContext)
 
+#enum AVPixelFormat
+AV_PIX_FMT_YUV420P=0
 AV_PIX_FMT_RGB24=2
+AV_PIX_FMT_YUVJ420P=12
+AV_PIX_FMT_NV12=23
+AV_PIX_FMT_DXVA2_VLD=53
 PIX_FMT_RGB24=AV_PIX_FMT_RGB24
 SWS_BILINEAR=2
-AV_PIX_FMT_YUVJ420P=12
 AVMEDIA_TYPE_VIDEO = 0
 AV_NOPTS_VALUE=c_int64(0x8000000000000000)    #((int64_t)UINT64_C(0x8000000000000000))
 
