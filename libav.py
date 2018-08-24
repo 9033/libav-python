@@ -1079,7 +1079,7 @@ AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX = 0x01
 '''
 import os
 
-os.environ['PATH']='C:\\sw\\ffmpeg-20180702-3c4af57-win64-shared\\bin' #location of avcodec-58.dll
+os.environ['PATH']+=';'+'C:\\sw\\ffmpeg-20180702-3c4af57-win64-shared\\bin' #location of avcodec-58.dll
 avcodec=WinDLL('avcodec-58.dll')
 avutil=WinDLL('avutil-56.dll')
 avformat=WinDLL('avformat-58.dll')
